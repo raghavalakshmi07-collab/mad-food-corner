@@ -1,0 +1,946 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAD Food Corner</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #fff8ef;
+            color: #333;
+        }
+
+        .topbar {
+            background: #680e0e;
+            color: white;
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .brand p {
+            margin: 5px 0 0;
+            font-style: italic;
+            color: #ffe1b0;
+        }
+
+        .navbar {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .navbar a:hover {
+            color: #ffc629;
+        }
+
+        .hero {
+            margin: 22px auto;
+            width: 94%;
+            min-height: 270px;
+            border-radius: 16px;
+            padding: 35px;
+            display: flex;
+            align-items: center;
+            background:
+                linear-gradient(90deg, rgba(30,12,4,.92),
+                rgba(30,12,4,.35)),
+                url("{{ url_for('static', filename='images/hero.jpg') }}")
+                center/cover,
+                #51240f;
+            color: white;
+        }
+
+        .hero-content {
+            max-width: 530px;
+        }
+
+        .hero h2 {
+            font-size: 38px;
+            margin: 0 0 12px;
+        }
+
+        .hero h2 span {
+            color: #ffc629;
+        }
+
+        .hero p {
+            font-size: 17px;
+            line-height: 1.6;
+        }
+
+        .explore-btn {
+            display: inline-block;
+            background: #ffc629;
+            color: #4b180b;
+            padding: 13px 23px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+
+        .quick-links {
+            width: 92%;
+            margin: 22px auto 30px;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .quick-links a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 17px;
+            border: 1px solid #edc7a7;
+            border-radius: 12px;
+            color: #741515;
+            text-decoration: none;
+            font-size: 17px;
+            font-weight: bold;
+            background: #fffaf4;
+        }
+
+        .quick-links a:hover {
+            background: #ffedda;
+            transform: translateY(-2px);
+        }
+
+        .quick-icon {
+            width: 48px;
+            height: 48px;
+            flex-shrink: 0;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            background: #850e13;
+            color: white;
+            font-size: 23px;
+        }
+
+        main {
+            width: 92%;
+            margin: auto;
+        }
+
+        .menu-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .menu-heading h2 {
+            color: #741515;
+            font-size: 27px;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .search-form input {
+            padding: 12px 16px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            min-width: 220px;
+            font-size: 15px;
+        }
+
+        .search-form button {
+            padding: 11px 18px;
+            border: 0;
+            border-radius: 22px;
+            background: #741515;
+            color: white;
+            cursor: pointer;
+        }
+
+        .food-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 18px;
+            margin: 15px 0 35px;
+        }
+
+        .food-card {
+            background: white;
+            padding: 12px;
+            border-radius: 13px;
+            box-shadow: 0 3px 12px rgba(70, 30, 10, .09);
+            border: 1px solid #f0e5d9;
+            min-width: 0;
+        }
+
+        .food-card .category {
+            display: inline-block;
+            color: #8a4c20;
+            background: #fff0dc;
+            padding: 5px 9px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .food-image {
+            width: 100%;
+            height: 165px;
+            object-fit: cover;
+            border-radius: 9px;
+            display: block;
+            background: #f5e6d4;
+        }
+
+        .food-card h3 {
+            margin: 12px 0 8px;
+            font-size: 17px;
+            overflow-wrap: anywhere;
+        }
+
+        .price {
+            margin: 7px 0;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .price strong {
+            color: #bd4c08;
+        }
+
+        .food-card label {
+            display: block;
+            margin-top: 12px;
+            font-size: 13px;
+        }
+
+        .food-card select {
+            width: 100%;
+            margin-top: 6px;
+            padding: 9px;
+            border: 1px solid #ddd;
+            border-radius: 7px;
+            background: white;
+        }
+
+        .add-button {
+            width: 100%;
+            margin-top: 10px;
+            padding: 12px;
+            background: #800e16;
+            color: white;
+            border: 0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .add-button:hover {
+            background: #a21c1c;
+        }
+
+        .no-results {
+            padding: 25px;
+        }
+
+        footer {
+            text-align: center;
+            background: #680e0e;
+            color: white;
+            padding: 20px;
+        }
+
+        @media (max-width: 1000px) {
+            .food-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+
+            .quick-links {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 650px) {
+            .topbar {
+                justify-content: center;
+                text-align: center;
+            }
+
+            .navbar {
+                justify-content: center;
+                gap: 15px;
+            }
+
+            .hero {
+                padding: 25px 20px;
+            }
+
+            .hero h2 {
+                font-size: 29px;
+            }
+
+            .food-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
+            }
+
+            .food-image {
+                height: 125px;
+            }
+
+            .quick-links a {
+                padding: 10px;
+                font-size: 14px;
+            }
+
+            .quick-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 18px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .food-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+/* ===== SPIN & WIN SECTION ===== */
+.spin-promo {
+    width: 94%;
+    margin: 25px auto 35px;
+    padding: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+    color: #fff3d7;
+    background:
+        radial-gradient(circle at top left, #741515, transparent 45%),
+        linear-gradient(135deg, #200303, #510909, #230303);
+    border: 2px solid #a82b19;
+    border-radius: 22px;
+    box-shadow: 0 8px 25px rgba(75, 0, 0, .22);
+    overflow: hidden;
+}
+
+.spin-wheel-area {
+    width: 250px;
+    max-width: 100%;
+    flex-shrink: 0;
+    position: relative;
+    padding-top: 12px;
+}
+
+.spin-pointer {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+    color: #fff0a8;
+    font-size: 27px;
+    text-shadow: 0 0 10px #ffb300;
+}
+
+.spin-wheel {
+    width: 100%;
+    aspect-ratio: 1;
+    border: 7px solid #ffcb55;
+    border-radius: 50%;
+    position: relative;
+    background: conic-gradient(
+        #e63946 0deg 60deg,
+        #ff9800 60deg 120deg,
+        #1488cc 120deg 180deg,
+        #7526a8 180deg 240deg,
+        #218c50 240deg 300deg,
+        #c58b12 300deg 360deg
+    );
+    box-shadow: 0 0 15px #ffb52e, inset 0 0 10px #390707;
+    transition: transform 4s cubic-bezier(.12,.72,.12,1);
+}
+
+.spin-label {
+    position: absolute;
+    width: 50%;
+    height: 50%;
+    left: 50%;
+    top: 0;
+    transform-origin: 0% 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 14px;
+    font-weight: 900;
+    text-align: center;
+    text-shadow: 1px 2px 3px #390707;
+}
+
+.spin-label:nth-child(1) { transform: rotate(30deg); }
+.spin-label:nth-child(2) { transform: rotate(90deg); }
+.spin-label:nth-child(3) { transform: rotate(150deg); }
+.spin-label:nth-child(4) { transform: rotate(210deg); }
+.spin-label:nth-child(5) { transform: rotate(270deg); }
+.spin-label:nth-child(6) { transform: rotate(330deg); }
+
+.spin-center {
+    position: absolute;
+    width: 48px;
+    height: 48px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: grid;
+    place-items: center;
+    border: 4px solid #ffe19a;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ffdf72, #d98200);
+    color: #641010;
+    font-size: 20px;
+    box-shadow: 0 0 12px #ffcf54;
+    z-index: 2;
+}
+
+.spin-content {
+    flex: 1;
+    min-width: 240px;
+    text-align: center;
+}
+
+.spin-content h2 {
+    margin: 0 0 10px;
+    color: #fff0c9;
+    font-size: clamp(30px, 4vw, 48px);
+    text-shadow: 0 0 15px #c56c19;
+}
+
+.spin-tagline {
+    color: #ffc629;
+    font-size: 19px;
+    font-weight: bold;
+    font-style: italic;
+}
+
+.spin-offers {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin: 20px 0;
+}
+
+.spin-offer {
+    padding: 12px 5px;
+    border: 1px dashed #ffad24;
+    border-radius: 9px;
+    background: rgba(255, 255, 255, .05);
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.spin-now-btn {
+    border: 0;
+    border-radius: 10px;
+    padding: 15px 30px;
+    width: min(100%, 320px);
+    background: linear-gradient(135deg, #ffdb59, #ff9700);
+    color: #481006;
+    font-size: 19px;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 0 0 18px rgba(255, 171, 24, .35);
+    transition: transform .2s, box-shadow .2s;
+}
+
+.spin-now-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 25px rgba(255, 190, 50, .65);
+}
+
+.spin-note {
+    color: #ffe1a0;
+    font-size: 13px;
+    margin-top: 13px;
+}
+
+.spin-result {
+    color: #ffdc72;
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 15px;
+}
+
+@media (max-width: 600px) {
+    .spin-promo {
+        padding: 22px 15px;
+        gap: 22px;
+    }
+
+    .spin-wheel-area {
+        width: 220px;
+    }
+
+    .spin-content {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .spin-offer {
+        font-size: 12px;
+    }
+}
+
+    </style>
+</head>
+
+<body>
+
+<header class="topbar">
+    <div class="brand">
+        <h1>🍴 MAD Food Corner</h1>
+        <p>Fresh Food, Happy Moments!</p>
+    </div>
+
+    <nav class="navbar">
+        <a href="{{ url_for('home') }}">⌂ Menu</a>
+        <a href="{{ url_for('view_cart') }}">🛒 Cart</a>
+        <a href="{{ url_for('location') }}">📍 Location</a>
+        <a href="{{ url_for('location') }}#customer-reviews">⭐ Rating</a>
+        <a href="{{ url_for('gallery') }}">📸 Gallery</a>
+         
+    </nav>
+</header>
+
+<section class="hero">
+    <div class="hero-content">
+        <h2>Welcome to<br><span>MAD</span> Food Corner</h2>
+        <p>Delicious food, great taste and a cozy place to make your moments special!</p>
+        <a class="explore-btn" href="#our-menu">🍴 Explore Menu</a>
+    </div>
+</section>
+
+<section class="spin-promo">
+    <div class="spin-wheel-area">
+        <div class="spin-pointer">▼</div>
+
+        <div class="spin-wheel" id="spinWheel">
+            <div class="spin-label">5% OFF</div>
+            <div class="spin-label">10% OFF</div>
+            <div class="spin-label">15% OFF</div>
+            <div class="spin-label">20% OFF</div>
+            <div class="spin-label">FREE FRIES</div>
+            <div class="spin-label">FREE DRINK</div>
+        </div>
+
+        <div class="spin-center">★</div>
+    </div>
+
+    <div class="spin-content">
+        <h2>🎉 SPIN &amp; WIN!</h2>
+
+        <p class="spin-tagline">
+            Spin once and get exciting offers!
+        </p>
+
+        <div class="spin-offers">
+            <div class="spin-offer">🔥 5% OFF</div>
+            <div class="spin-offer">✨ 10% OFF</div>
+            <div class="spin-offer">🎁 15% OFF</div>
+            <div class="spin-offer">💥 20% OFF</div>
+            <div class="spin-offer">🥤 FREE DRINK</div>
+            <div class="spin-offer">🍟 FREE FRIES</div>
+        </div>
+
+        <button type="button" class="spin-now-btn"
+                id="spinNowButton"
+                onclick="playSpin()">
+            🎡 SPIN AT ONCE!
+        </button>
+
+        <div class="spin-result" id="spinResult" aria-live="polite"></div>
+
+        <p class="spin-note">
+            🔒 One spin per customer only!
+        </p>
+    </div>
+</section>
+
+
+<section class="quick-links">
+    <a href="#our-menu">
+        <span class="quick-icon">🍴</span> Menu ›
+    </a>
+    <a href="{{ url_for('view_cart') }}">
+        <span class="quick-icon">🛒</span> Cart ({{ cart_count }}) ›
+    </a>
+    <a href="{{ url_for('location') }}">
+        <span class="quick-icon">📍</span> Location ›
+    </a>
+    <a href="{{ url_for('location') }}#customer-reviews">
+        <span class="quick-icon">⭐</span> Rating ›
+    </a>
+</section>
+
+<main id="our-menu">
+    <div class="menu-heading">
+        <h2>👨‍🍳 Our Delicious Menu</h2>
+
+        <form action="{{ url_for('home') }}"
+              method="GET" class="search-form">
+            <input
+                type="text"
+                name="search"
+                placeholder="Search food items..."
+                value="{{ search_query }}"
+            >
+            <button type="submit">Search</button>
+
+            {% if search_query %}
+                <a href="{{ url_for('home') }}">Clear</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <div class="food-grid">
+        {% for item in items %}
+        <div class="food-card">
+
+            {% if item.get("Category") %}
+                <span class="category">{{ item["Category"] }}</span>
+            {% endif %}
+
+            {% set image_name = item.get('Image', '') | string | trim %}
+
+            {% if image_name %}
+                <img
+                    src="{{ url_for('static', filename='images/' + image_name) }}"
+                    alt="{{ item['Food Item'] }}"
+                    class="food-image"
+                    onerror="this.onerror=null;this.style.display='none';"
+                >
+            {% else %}
+                <div class="food-image"
+                     style="display:grid;place-items:center;">
+                    🍽️ Image unavailable
+                </div>
+            {% endif %}
+
+            <h3>{{ item["Food Item"] }}</h3>
+
+            <div class="price">
+                {% if item["Full Price (₹)"] != "" %}
+                    <strong>₹{{ item["Full Price (₹)"] }}</strong>
+                    (Full)
+                {% endif %}
+
+                {% if item["Half Price (₹)"] != "" %}
+                    &nbsp; <strong>₹{{ item["Half Price (₹)"] }}</strong>
+                    (Half)
+                {% endif %}
+            </div>
+
+            <form
+                action="{{ url_for('add_to_cart', item_id=item['_item_id']) }}"
+                method="POST">
+
+                <label for="size-{{ item['_item_id'] }}">
+                    Select Size:
+                </label>
+
+                <select
+                    name="size"
+                    id="size-{{ item['_item_id'] }}"
+                    required>
+
+                    {% if item["Full Price (₹)"] != "" %}
+                    <option value="Full">
+                        Full - ₹{{ item["Full Price (₹)"] }}
+                    </option>
+                    {% endif %}
+
+                    {% if item["Half Price (₹)"] != "" %}
+                    <option value="Half">
+                        Half - ₹{{ item["Half Price (₹)"] }}
+                    </option>
+                    {% endif %}
+
+                </select>
+
+                <button type="submit" class="add-button">
+                    🛒 Add to Cart
+                </button>
+            </form>
+        </div>
+
+        {% else %}
+            <p class="no-results">
+                No food items found for "{{ search_query }}".
+                Please try another food name.
+            </p>
+        {% endfor %}
+    </div>
+</main>
+
+<footer>
+    <p>© MAD Food Corner | Fresh Food, Happy Moments!</p>
+</footer>
+
+<script>
+async function playSpin() {
+    const button = document.getElementById("spinNowButton");
+    const wheel = document.getElementById("spinWheel");
+    const result = document.getElementById("spinResult");
+
+    button.disabled = true;
+    button.textContent = "🎡 SPINNING...";
+    result.textContent = "";
+
+    try {
+        const response = await fetch("/spin", {
+            method: "POST"
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            result.textContent = data.message || "Unable to spin.";
+            button.textContent = "SPIN USED";
+            return;
+        }
+
+        wheel.style.transform = `rotate(${data.rotation}deg)`;
+
+        setTimeout(() => {
+            result.textContent = "🎉 You won: " + data.offer;
+            button.textContent = "OFFER WON!";
+        }, 4100);
+
+    } catch (error) {
+        result.textContent = "Please try again.";
+        button.disabled = false;
+        button.textContent = "🎡 SPIN AT ONCE!";
+    }
+}
+</script>
+
+<!-- Floating RAG Chatbot -->
+<div id="rag-widget">
+    <button id="rag-toggle" onclick="toggleRAG()" title="Chat with us">
+        🤖
+    </button>
+
+    <div id="rag-chatbox">
+        <div class="rag-header">
+            <span>🤖 MAD Food Corner Assistant</span>
+            <button onclick="toggleRAG()">×</button>
+        </div>
+
+        <div id="rag-messages">
+            <p class="bot-message">
+                Hi! Welcome to MAD Food Corner. 🍗
+                Ask me about our menu and prices!
+            </p>
+        </div>
+
+        <div class="rag-input-area">
+            <input id="rag-question"
+                   type="text"
+                   placeholder="Ask about our menu..."
+                   onkeydown="if(event.key==='Enter') sendRAGMessage()">
+
+            <button onclick="sendRAGMessage()">Send</button>
+        </div>
+    </div>
+</div>
+
+<style>
+#rag-widget {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 9999;
+    font-family: Arial, sans-serif;
+}
+
+#rag-toggle {
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    border: none;
+    background: #ff8c00;
+    color: white;
+    font-size: 32px;
+    cursor: pointer;
+    box-shadow: 0 4px 14px #0004;
+}
+
+#rag-chatbox {
+    display: none;
+    position: absolute;
+    right: 0;
+    bottom: 75px;
+    width: 320px;
+    height: 400px;
+    background: #fffaf0;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 5px 22px #0004;
+    border: 1px solid #ddd;
+}
+
+.rag-header {
+    background: #7b1113;
+    color: white;
+    padding: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.rag-header button {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+#rag-messages {
+    height: 275px;
+    overflow-y: auto;
+    padding: 12px;
+    color: #222;
+}
+
+.bot-message, .user-message {
+    padding: 9px 11px;
+    border-radius: 10px;
+    margin: 8px 0;
+    overflow-wrap: anywhere;
+}
+
+.bot-message {
+    background: #f0e4d2;
+}
+
+.user-message {
+    background: #ffe0b2;
+    text-align: right;
+}
+
+.rag-input-area {
+    display: flex;
+    padding: 8px;
+    gap: 5px;
+}
+
+#rag-question {
+    min-width: 0;
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+.rag-input-area button {
+    background: #7b1113;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 9px;
+    cursor: pointer;
+}
+
+
+
+</style>
+
+
+
+
+<script>
+function toggleRAG() {
+    const box = document.getElementById("rag-chatbox");
+    box.style.display =
+        box.style.display === "block" ? "none" : "block";
+}
+
+async function sendRAGMessage() {
+    const input = document.getElementById("rag-question");
+    const messages = document.getElementById("rag-messages");
+    const question = input.value.trim();
+
+    if (!question) return;
+
+    const userMessage = document.createElement("p");
+    userMessage.className = "user-message";
+    userMessage.textContent = question;
+    messages.appendChild(userMessage);
+
+    input.value = "";
+
+    const botMessage = document.createElement("p");
+    botMessage.className = "bot-message";
+    botMessage.textContent = "Searching menu...";
+    messages.appendChild(botMessage);
+    messages.scrollTop = messages.scrollHeight;
+
+    try {
+        const response = await fetch("/chatbot", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({message: question})
+        });
+
+        const data = await response.json();
+        botMessage.textContent =
+            data.reply || "Sorry, no answer available.";
+    } catch (error) {
+        botMessage.textContent =
+            "Unable to connect. Please try again.";
+    }
+
+    messages.scrollTop = messages.scrollHeight;
+}
+</script>
+
+</body>
+</html>
+
+
+</body>
+</html>

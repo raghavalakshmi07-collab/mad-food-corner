@@ -1,0 +1,97 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owner Dashboard - MAD Food Corner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #fff8f0;
+            padding: 20px;
+        }
+        h1 { color: darkred; }
+        .table-container { overflow-x: auto; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th { background: darkred; color: white; }
+        button { padding: 8px; cursor: pointer; }
+        select { padding: 8px; }
+    </style>
+</head>
+<body>
+    <h1>MAD Food Corner - Owner Dashboard</h1>
+
+    <p>Total Orders: {{ orders|length }}</p>
+    <a href="{{ url_for('owner_logout') }}">Logout</a>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Phone</th>
+                    <th>Address</th>
+                    <th>Total</th>
+                    <th>Payment</th>
+                    <th>Status</th>
+                    <th>Update</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>{{ order['order_id'] }}</td>
+                    <td>{{ order['customer_name'] }}</td>
+                    <td>{{ order['phone'] }}</td>
+                    <td>{{ order['address'] }}</td>
+                    <td>₹{{ "%.2f"|format(order['total']) }}</td>
+                    <td>{{ order['payment'] }}</td>
+                    <td>{{ order['status'] }}</td>
+                    <td>
+                        <form method="POST"
+                              action="{{ url_for('update_order_status') }}">
+                            <input type="hidden" name="order_id"
+                                   value="{{ order['order_id'] }}">
+
+                            <select name="status">
+                                <option value="Pending"
+                                    {% if order['status'] == 'Pending' %}selected{% endif %}>
+                                    Pending
+                                </option>
+                                <option value="Preparing"
+                                    {% if order['status'] == 'Preparing' %}selected{% endif %}>
+                                    Preparing
+                                </option>
+                                <option value="Delivered"
+                                    {% if order['status'] == 'Delivered' %}selected{% endif %}>
+                                    Delivered
+                                </option>
+                            </select>
+
+                            <button type="submit">Update</button>
+                        </form>
+                    </td>
+                    <td>{{ order['created_at'] }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="9">No orders yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

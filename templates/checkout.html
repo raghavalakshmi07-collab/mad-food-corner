@@ -1,0 +1,132 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - MAD Food Corner</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        .checkout-container {
+            max-width: 650px;
+            margin: 35px auto;
+            padding: 25px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0,0,0,.1);
+        }
+        .checkout-container h2 {
+            text-align: center;
+            color: #e67e22;
+        }
+        .checkout-form label {
+            display: block;
+            margin: 16px 0 7px;
+            font-weight: bold;
+        }
+        .checkout-form input,
+        .checkout-form textarea,
+        .checkout-form select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        .checkout-total {
+            margin-top: 22px;
+            padding: 15px;
+            background: #fff3e6;
+            border-radius: 10px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .place-order-button {
+            width: 100%;
+            margin-top: 20px;
+            padding: 14px;
+            background: #e67e22;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .place-order-button:hover {
+            background: #cf6813;
+        }
+    </style>
+</head>
+
+<body>
+<header>
+    <h1>🍴 MAD Food Corner</h1>
+    <p>Fresh Food, Happy Moments!</p>
+</header>
+
+<main class="checkout-container">
+    <h2>🧾 Checkout</h2>
+    <p>Enter your home delivery details.</p>
+
+    <form class="checkout-form"
+          action="{{ url_for('place_order') }}"
+          method="POST">
+
+        <label for="customer_name">Customer Name</label>
+        <input type="text" id="customer_name"
+               name="customer_name" maxlength="100" required>
+
+        <label for="phone">Mobile Number</label>
+        <input type="tel" id="phone" name="phone"
+               pattern="[0-9]{10}" maxlength="10"
+               inputmode="numeric" placeholder="10-digit mobile number"
+               required>
+
+        <label for="address">Home Delivery Address</label>
+        <textarea id="address" name="address" rows="4"
+                  maxlength="500" placeholder="Enter full delivery address"
+                  required></textarea>
+
+        <label for="payment">Payment Method</label>
+        <select id="payment" name="payment" required>
+            <option value="COD">Cash on Delivery</option>
+            <option value="UPI">UPI</option>
+        </select>
+
+       <div class="checkout-total">
+    <p>Subtotal: ₹{{ "%.2f"|format(total) }}</p>
+
+    {% if spin_offer %}
+        <p>🎉 Won Offer: {{ spin_offer.label }}</p>
+
+        {% if spin_offer.type == "discount" %}
+            <p style="color: green;">
+                Discount: -₹{{ "%.2f"|format(discount_amount) }}
+            </p>
+        {% else %}
+            <p>🎁 Free Gift: {{ spin_offer.value }}</p>
+        {% endif %}
+    {% endif %}
+
+    <hr>
+    <p>Final Total: ₹{{ "%.2f"|format(final_total) }}</p>
+</div>
+
+        <button type="submit" class="place-order-button">
+            Place Order
+        </button>
+    </form>
+
+    <p style="text-align:center; margin-top:18px;">
+        <a href="{{ url_for('view_cart') }}">← Back to Cart</a>
+    </p>
+</main>
+
+<footer>
+    <p>© MAD Food Corner</p>
+</footer>
+</body>
+</html>

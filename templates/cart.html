@@ -1,0 +1,343 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart - MAD Food Corner</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        .cart-page {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .cart-heading {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .cart-heading p { color: #777; }
+
+        .cart-layout {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 25px;
+            align-items: start;
+        }
+
+        .cart-items-list {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .cart-item-image {
+            width: 125px;
+            height: 125px;
+            object-fit: cover;
+            border-radius: 12px;
+            flex-shrink: 0;
+        }
+
+        .cart-item-details { flex: 1; min-width: 0; }
+
+        .cart-item-details h3 {
+            margin: 0 0 10px;
+            color: #333;
+        }
+
+        .cart-item-details p {
+            margin: 6px 0;
+            color: #666;
+        }
+
+        .cart-price {
+            color: #d96b12 !important;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 14px 0;
+        }
+
+        .quantity-controls form { margin: 0; }
+
+        .quantity-controls button {
+            width: 35px;
+            height: 35px;
+            border: none;
+            border-radius: 8px;
+            background: #fff0df;
+            color: #c45d08;
+            font-size: 22px;
+            cursor: pointer;
+        }
+
+        .quantity-number {
+            font-weight: bold;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .remove-button {
+            padding: 8px 13px;
+            border: 1px solid #e7a3a3;
+            border-radius: 8px;
+            background: #fff1f1;
+            color: #c62828;
+            cursor: pointer;
+        }
+
+        .cart-summary {
+            padding: 24px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 20px;
+        }
+
+        .cart-summary h3 { margin-top: 0; color: #333; }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin: 18px 0;
+        }
+
+        .summary-total {
+            padding-top: 16px;
+            border-top: 1px solid #eee;
+            font-size: 19px;
+            font-weight: bold;
+        }
+
+        .continue-button {
+            display: block;
+            margin-top: 15px;
+            padding: 13px;
+            border-radius: 10px;
+            background: #e67e22;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .continue-button:hover { background: #cf6813; }
+
+        .checkout-button {
+            background: #218838;
+        }
+
+        .checkout-button:hover { background: #19692c; }
+
+        .empty-cart {
+            padding: 45px 20px;
+            background: white;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        }
+
+        @media (max-width: 700px) {
+            .cart-layout { grid-template-columns: 1fr; }
+            .cart-item { padding: 14px; gap: 12px; }
+            .cart-item-image { width: 90px; height: 90px; }
+            .cart-summary { position: static; }
+        }
+
+        @media (max-width: 380px) {
+            .cart-item { align-items: flex-start; }
+            .cart-item-image { width: 70px; height: 70px; }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>🍴 MAD Food Corner</h1>
+    <p>Fresh Food, Happy Moments!</p>
+
+    <a class="cart-link" href="{{ url_for('home') }}">
+        ← Continue Shopping
+    </a>
+
+    <a class="cart-link" href="{{ url_for('location') }}">
+        📍 Location
+    </a>
+</header>
+
+<main class="cart-page">
+
+    <div class="cart-heading">
+        <h2>🛒 My Shopping Cart</h2>
+        <p>Your delicious choices, all in one place!</p>
+    </div>
+
+    {% if cart_items %}
+
+    <div class="cart-layout">
+
+        <div class="cart-items-list">
+
+            {% for item in cart_items %}
+
+            <div class="cart-item">
+
+                {% if item.image %}
+                <img
+                    src="{{ url_for('static', filename='images/' + item.image) }}"
+                    alt="{{ item.name }}"
+                    class="cart-item-image"
+                    onerror="this.style.display='none'">
+                {% endif %}
+
+                <div class="cart-item-details">
+
+                    <h3>{{ item.name }}</h3>
+                    <p>Size: {{ item.size }}</p>
+
+                    <p class="cart-price">
+                        ₹{{ "%.2f"|format(item.price) }}
+                    </p>
+
+                    <div class="quantity-controls">
+
+                        <form
+                            action="{{ url_for('update_cart', cart_key=item.key) }}"
+                            method="POST">
+                            <button type="submit" name="action"
+                                    value="decrease"
+                                    aria-label="Decrease quantity">−</button>
+                        </form>
+
+                        <span class="quantity-number">
+                            {{ item.quantity }}
+                        </span>
+
+                        <form
+                            action="{{ url_for('update_cart', cart_key=item.key) }}"
+                            method="POST">
+                            <button type="submit" name="action"
+                                    value="increase"
+                                    aria-label="Increase quantity">+</button>
+                        </form>
+
+                    </div>
+
+                    <p>
+                        Subtotal:
+                        <strong>₹{{ "%.2f"|format(item.subtotal) }}</strong>
+                    </p>
+
+                    <form
+                        action="{{ url_for('remove_from_cart', cart_key=item.key) }}"
+                        method="POST">
+                        <button class="remove-button" type="submit">
+                            🗑 Remove Item
+                        </button>
+                    </form>
+
+                </div>
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        <aside class="cart-summary">
+
+            <h3>🧾 Bill Summary</h3>
+
+            <div class="summary-row">
+                <span>Total Items</span>
+                <strong>{{ cart_items|sum(attribute='quantity') }}</strong>
+            </div>
+
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <strong>₹{{ "%.2f"|format(total) }}</strong>
+            </div>
+            {% if spin_offer %}
+<div class="summary-row">
+    <span>🎉 Won Offer</span>
+    <strong>{{ spin_offer.label }}</strong>
+</div>
+
+{% if spin_offer.type == "discount" %}
+<div class="summary-row">
+    <span>Discount</span>
+    <strong style="color: green;">
+        -₹{{ "%.2f"|format(discount_amount) }}
+    </strong>
+</div>
+{% else %}
+<div class="summary-row">
+    <span>🎁 Free Gift</span>
+    <strong>{{ spin_offer.value }}</strong>
+</div>
+{% endif %}
+{% endif %}
+
+            <div class="summary-row summary-total">
+                <span>FINAL Total</span>
+                <span>₹{{ "%.2f"|format(final_total) }}</span>
+            </div>
+
+            <a href="{{ url_for('home') }}" class="continue-button">
+                + Add More Food
+            </a>
+
+            <!-- Proceed to Checkout -->
+            <a href="{{ url_for('checkout') }}"
+               class="continue-button checkout-button">
+                🛵 Place Order
+            </a>
+
+        </aside>
+
+    </div>
+
+    {% else %}
+
+    <div class="empty-cart">
+        <h2>🛒 Your Cart is Empty!</h2>
+        <p>Your favourite food is waiting for you.</p>
+
+        <a href="{{ url_for('home') }}" class="continue-button">
+            Explore Our Menu
+        </a>
+    </div>
+
+    {% endif %}
+
+</main>
+
+<footer>
+    <p>© MAD Food Corner</p>
+</footer>
+
+</body>
+</html>

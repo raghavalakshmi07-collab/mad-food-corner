@@ -1,0 +1,299 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location - MAD Food Corner</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        .location-page {
+            max-width: 750px;
+            margin: 15px auto;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .location-card {
+            background: white;
+            padding: 15px;
+            border-radius: 18px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.10);
+        }
+
+        .location-card h2 {
+            color: #e67e22;
+            margin:5px 0 10px;
+        }
+
+        .location-address {
+            color: #555;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .map-frame {
+            width: 100%;
+            height: 200px;
+            border: 0;
+            border-radius: 12px;
+        }
+
+        .direction-button {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 10px 20px;
+            background: #e67e22;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .direction-button:hover {
+            background: #cf6813;
+        }
+
+        @media (max-width: 600px) {
+            .map-frame {
+                height: 300px;
+            }
+
+            .location-card {
+                padding: 15px;
+            }
+        }
+        
+.owner-rating {
+    max-width: 500px;
+    margin: 30px auto;
+    padding: 25px 20px;
+    text-align: center;
+    background: #FFF8F0;
+    border: 2px solid #E67E22;
+    border-radius: 16px;
+    box-shadow: 0 6px 18px rgba(139, 0, 0, 0.12);
+}
+
+.owner-rating h2 {
+    color: #8B0000;
+    margin-bottom: 12px;
+}
+
+.rating-stars {
+    color: #E67E22;
+    font-size: 32px;
+    letter-spacing: 4px;
+}
+
+.rating-score {
+    color: #8B0000;
+    font-size: 25px;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.rating-message {
+    color: #555;
+    font-size: 14px;
+}
+
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>🍴 MAD Food Corner</h1>
+    <p>Fresh Food, Happy Moments!</p>
+
+    <a class="cart-link" href="{{ url_for('home') }}">
+        🏠 Back to Menu
+    </a>
+</header>
+
+<main class="location-page">
+    <div class="location-card">
+        <h2>📍 Our Restaurant Location</h2>
+
+        <p class="location-address">
+            MAD Food Corner<br>
+            Pratap Nagar, Kakinada,<br>
+            Andhra Pradesh - 533004
+        </p>
+
+        <iframe
+            class="map-frame"
+            src="https://maps.google.com/maps?q=Pratap%20Nagar%2C%20Kakinada%2C%20Andhra%20Pradesh%20533004&z=15&output=embed"
+            loading="lazy"
+            allowfullscreen
+            referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+
+        <a
+            class="direction-button"
+            href="https://www.google.com/maps/search/?api=1&query=Pratap+Nagar%2C+Kakinada%2C+Andhra+Pradesh+533004"
+            target="_blank"
+            rel="noopener noreferrer">
+            📍 Get Directions
+        </a>
+    </div>
+</main>
+
+<footer>
+    <p>© MAD Food Corner</p>
+</footer>
+
+<!-- Owner's Rating -->
+<section class="owner-rating">
+    <h2>⭐ Owner's Rating</h2>
+
+    <div class="rating-stars" aria-label="5 out of 5 stars">
+        ★★★★★
+    </div>
+
+    <p class="rating-score">5.0 / 5.0</p>
+    <p class="rating-message">
+        Rated with love at MAD Food Corner!
+    </p>
+</section>
+
+
+<!-- Customer Rating and Reviews -->
+<section class="owner-rating" id="customer-reviews"
+         style="max-width:700px;margin:30px auto;padding:20px;
+                background:#FFF8F0;border-radius:12px;
+                text-align:center;">
+
+    <h2>⭐ Customer Ratings &amp; Comments</h2>
+
+    {% if submitted %}
+        <p style="color:green;font-weight:bold;">
+            Thank you! Your review was submitted successfully.
+        </p>
+    {% endif %}
+
+    {% if error_message %}
+        <p style="color:red;font-weight:bold;">
+            {{ error_message }}
+        </p>
+    {% endif %}
+
+    <p>
+        Average Rating:
+        <strong>{{ "%.1f"|format(average_rating) }} / 5</strong>
+    </p>
+
+    <p>{{ total_reviews }} customer review(s)</p>
+
+    <form action="{{ url_for('location') }}" method="POST">
+
+        <label for="customer_name">Your Name</label>
+        <input
+            type="text"
+            id="customer_name"
+            name="customer_name"
+            maxlength="80"
+            required
+            placeholder="Enter your name"
+            style="display:block;width:100%;padding:12px;
+                   margin:8px 0 15px;box-sizing:border-box;"
+        >
+
+        <label for="rating">Your Rating</label>
+        <select
+            id="rating"
+            name="rating"
+            required
+            style="display:block;width:100%;padding:12px;
+                   margin:8px 0 15px;box-sizing:border-box;"
+        >
+            <option value="">Select stars</option>
+            <option value="5">★★★★★ - Excellent</option>
+            <option value="4">★★★★ - Very Good</option>
+            <option value="3">★★★ - Good</option>
+            <option value="2">★★ - Average</option>
+            <option value="1">★ - Poor</option>
+        </select>
+
+        <label for="comment">Your Comments</label>
+        <textarea
+            id="comment"
+            name="comment"
+            rows="4"
+            maxlength="1000"
+            required
+            placeholder="Write your experience..."
+            style="display:block;width:100%;padding:12px;
+                   margin:8px 0 15px;box-sizing:border-box;"
+        ></textarea>
+
+        <button
+            type="submit"
+            style="background:#E67E22;color:white;border:0;
+                   padding:13px 24px;border-radius:8px;
+                   font-weight:bold;cursor:pointer;"
+        >
+            Submit Review
+        </button>
+    </form>
+
+    <hr style="margin:25px 0;">
+
+    <h3>Recent Customer Reviews</h3>
+
+    {% for review in reviews %}
+        <div style="background:white;padding:15px;margin:12px 0;
+                    border-radius:10px;text-align:left;
+                    border:1px solid #eee;">
+
+            <strong>{{ review["customer_name"]|e }}</strong>
+
+            <p style="color:#E67E22;font-size:22px;margin:8px 0;">
+                {{ "★" * review["rating"] }}{{ "☆" * (5 - review["rating"]) }}
+            </p>
+
+            <p style="overflow-wrap:anywhere;">
+                {{ review["comment"]|e }}
+            </p>
+
+            <small>{{ review["created_at"] }}</small>
+        </div>
+    {% else %}
+        <p>No customer reviews yet. Be the first to review!</p>
+    {% endfor %}
+
+<!-- MAD Food Corner Shop Timings -->
+<div class="shop-timings">
+    <h2>🕒 Shop Timings</h2>
+
+    <div class="timing-row">
+        <span>Opening Time</span>
+        <strong>11:00 AM</strong>
+    </div>
+
+    <div class="timing-row">
+        <span>Closing Time</span>
+        <strong>11:00 PM</strong>
+    </div>
+
+    <div class="timing-row">
+        <span>Working Days</span>
+        <strong>Every Day</strong>
+    </div>
+
+    <div class="shop-status">
+        <span class="status-dot"></span>
+        Open Daily
+    </div>
+</div>
+
+</section>
+</body>
+</html>
+
+</body>
+</html>

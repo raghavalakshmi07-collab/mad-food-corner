@@ -1,0 +1,187 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spin & Win | MAD Food Corner</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #3b0808;
+            color: #fff4df;
+            text-align: center;
+            padding: 25px 15px;
+        }
+
+        .container {
+            max-width: 550px;
+            margin: auto;
+            background: #fff0d5;
+            color: #570b0b;
+            padding: 25px;
+            border-radius: 20px;
+        }
+
+        h1 {
+            color: #9e1717;
+        }
+
+        .wheel-container {
+            position: relative;
+            width: min(100%, 360px);
+            aspect-ratio: 1;
+            margin: 25px auto;
+        }
+
+        .pointer {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            color: #3b0808;
+            font-size: 35px;
+        }
+
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border: 8px solid #ffad24;
+            border-radius: 50%;
+            background: conic-gradient(
+                #e53935 0deg 60deg,
+                #ff9800 60deg 120deg,
+                #168aad 120deg 180deg,
+                #7b2cbf 180deg 240deg,
+                #2e9d50 240deg 300deg,
+                #d4a017 300deg 360deg
+            );
+            transition: transform 4s cubic-bezier(.15,.65,.15,1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .offer {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            left: 50%;
+            top: 0;
+            transform-origin: 0% 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 15px;
+            color: white;
+            text-shadow: 1px 1px 2px #333;
+        }
+
+        .offer:nth-child(1) { transform: rotate(30deg); }
+        .offer:nth-child(2) { transform: rotate(90deg); }
+        .offer:nth-child(3) { transform: rotate(150deg); }
+        .offer:nth-child(4) { transform: rotate(210deg); }
+        .offer:nth-child(5) { transform: rotate(270deg); }
+        .offer:nth-child(6) { transform: rotate(330deg); }
+
+        button {
+            background: #ffad24;
+            color: #3b0808;
+            border: none;
+            border-radius: 10px;
+            padding: 14px 28px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .note {
+            font-size: 13px;
+            margin-top: 18px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🎡 MAD Food Corner</h1>
+        <h2>SPIN & WIN!</h2>
+        <p>Spin once and try your luck!</p>
+
+        <div class="wheel-container">
+            <div class="pointer">▼</div>
+
+            <div class="wheel" id="wheel">
+                <div class="offer">5% OFF</div>
+                <div class="offer">10% OFF</div>
+                <div class="offer">15% OFF</div>
+                <div class="offer">20% OFF</div>
+                <div class="offer">Free Drink</div>
+                <div class="offer">Free Fries</div>
+            </div>
+        </div>
+
+        <button id="spinButton" onclick="spinWheel()">
+            SPIN NOW
+        </button>
+
+        <div id="result"></div>
+        <p class="note">One spin per customer. Offers are subject to shop terms.</p>
+    </div>
+
+    <script>
+        async function spinWheel() {
+            const button = document.getElementById("spinButton");
+            const wheel = document.getElementById("wheel");
+            const result = document.getElementById("result");
+
+            button.disabled = true;
+            result.textContent = "Spinning...";
+
+            try {
+                const response = await fetch("/spin", {
+                    method: "POST"
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    result.textContent = data.message;
+                    return;
+                }
+
+                wheel.style.transform =
+                    `rotate(${data.rotation}deg)`;
+
+                setTimeout(() => {
+                    result.textContent =
+                        "🎉 You won: " + data.offer;
+                }, 4100);
+
+            } catch (error) {
+                result.textContent =
+                    "Unable to spin. Please try again.";
+                button.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

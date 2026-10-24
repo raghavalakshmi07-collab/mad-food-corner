@@ -1,0 +1,111 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Order - MAD Food Corner</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #8B0000;
+            margin: 0;
+            padding: 25px 15px;
+        }
+
+        .card {
+            max-width: 550px;
+            margin: 35px auto;
+            padding: 25px;
+            background: #FFF8F0;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        h1, h2 {
+            color: #8B0000;
+        }
+
+        input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px;
+            margin: 12px 0;
+            border: 1px solid #ccc;
+            border-radius: 7px;
+        }
+
+        button, .menu-link {
+            display: inline-block;
+            padding: 12px 20px;
+            background: #E67E22;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .status {
+            padding: 12px;
+            margin: 18px 0;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .pending { background: #fff0c2; color: #805600; }
+        .preparing { background: #dceeff; color: #07539b; }
+        .delivered { background: #dff5e3; color: #176b2c; }
+
+        .error { color: #b00020; }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <h1>📦 Track Your Order</h1>
+        <p>Enter your Order ID to check your order status.</p>
+
+        <form method="POST" action="/track-order">
+            <input
+                type="text"
+                name="order_id"
+                placeholder="Example: MAD-..."
+                required
+            >
+            <button type="submit">Track Order</button>
+        </form>
+
+        {% if error_message %}
+            <p class="error">{{ error_message }}</p>
+        {% endif %}
+
+        {% if order %}
+            <hr>
+            <h2>Order Details</h2>
+
+            <p><strong>Order ID:</strong> {{ order["order_id"] }}</p>
+            <p><strong>Customer:</strong> {{ order["customer_name"] }}</p>
+            <p><strong>Total:</strong> ₹{{ "%.2f"|format(order["total"]) }}</p>
+
+            <div class="status {{ order['status']|lower }}">
+                Status: {{ order["status"] }}
+            </div>
+
+            <p>
+                {% if order["status"] == "Pending" %}
+                    Your order is waiting to be prepared.
+                {% elif order["status"] == "Preparing" %}
+                    Your food is being prepared.
+                {% elif order["status"] == "Delivered" %}
+                    Your order has been delivered. Thank you!
+                {% endif %}
+            </p>
+        {% endif %}
+
+        <a href="/" class="menu-link">Back to Menu</a>
+    </div>
+</body>
+</html>
